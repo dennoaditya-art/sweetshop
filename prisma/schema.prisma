@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  name      String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id          String    @id
+  name        String
+  emoji       String
+  description String
+  products    Product[]
+}
+
+model Product {
+  id             String         @id @default(cuid())
+  name           String
+  slug           String         @unique
+  description    String
+  price          Float
+  originalPrice  Float?
+  image          String
+  images         String         @default("[]")
+  categoryId     String
+  category       Category       @relation(fields: [categoryId], references: [id])
+  tags           String         @default("[]")
+  rating         Float          @default(0)
+  sold           Int            @default(0)
+  isBestSeller   Boolean        @default(false)
+  isNew          Boolean        @default(false)
+  stock          Int            @default(0)
+  variants       String         @default("[]")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  orderItems     OrderItem[]
+}
+
+model Order {
+  id               String      @id @default(cuid())
+  items            OrderItem[]
+  customerName     String
+  customerPhone    String
+  customerAddress  String
+  customerNotes    String?
+  total            Float
+  status           String      @default("baru")
+  paymentStatus    String      @default("pending")
+  midtransOrderId  String?     @unique
+  snapToken        String?
+  paidAt           DateTime?
+  note             String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id])
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
+  productName  String
+  productPrice Float
+  variant      String?
+  quantity     Int
+  image        String
+}
+
+model SiteConfig {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

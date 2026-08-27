@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+:root {
+  /* Nail Art Fresh palette */
+  --background: #FFF9F5;
+  --foreground: #2D1A1E;
+  --primary: #FF6B9D;
+  --primary-foreground: #FFF9F5;
+  --secondary: #A8E6CF;
+  --secondary-foreground: #1A3A2A;
+  --accent: #C3B1E1;
+  --accent-foreground: #2D1A1E;
+  --muted: #FFF0E6;
+  --muted-foreground: #8B6B73;
+  --border: #FFD3E0;
+  --input: #FFD3E0;
+  --ring: #FF6B9D;
+  --card: #FFFFFF;
+  --card-foreground: #2D1A1E;
+  --radius: 1rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
+}
+
+* { border-color: var(--border); }
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Chrome glaze text */
+.glaze-text {
+  background: linear-gradient(135deg, #FF6B9D 0%, #FFB5D8 25%, #C3B1E1 50%, #A8E6CF 75%, #FF6B9D 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: glaze-shift 4s ease infinite;
+}
+
+@keyframes glaze-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Glass card */
+.glass-card {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,211,224,0.6);
+  box-shadow: 0 8px 32px rgba(255,107,157,0.12), 0 2px 8px rgba(255,107,157,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+/* Rhinestone dot */
+.rhinestone {
+  background: radial-gradient(circle at 30% 30%, #fff, #FFD3E0 40%, #FF6B9D 100%);
+  box-shadow: 0 1px 4px rgba(255,107,157,0.4), inset 0 1px 1px rgba(255,255,255,0.8);
+}
+
+/* French tip arc */
+.french-tip {
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--muted); }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 999px; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .glaze-text { animation: none; }
+}

@@ -1,0 +1,56 @@
+/**
+ * Minimal i18n — no heavy lib, just dict per locale.
+ * Buyer adds locale by extending this object.
+ */
+export const dict = {
+  en: {
+    menu: "Menu",
+    flavors: "Flavors",
+    about: "About",
+    cart: "Cart",
+    checkout: "Checkout",
+    total: "Total",
+    addToCart: "Add to Cart",
+    viewMenu: "View Menu",
+    bestSeller: "Best Seller",
+    new: "New",
+    sold: "sold",
+    stock: "Stock",
+    variant: "Variant",
+    placeOrder: "Place Order",
+    pay: "Pay",
+    orders: "Orders",
+    products: "Products",
+    settings: "Settings",
+    logout: "Logout",
+    orderSuccess: "Order placed!",
+    cartEmpty: "Your cart is empty — pick a favorite flavor!",
+    continueShopping: "Continue shopping",
+  },
+  id: {
+    menu: "Menu",
+    flavors: "Rasa",
+    about: "Tentang",
+    cart: "Keranjang",
+    checkout: "Checkout",
+    total: "Total",
+    addToCart: "Tambah ke Keranjang",
+    viewMenu: "Lihat Menu",
+    bestSeller: "Best Seller",
+    new: "Baru",
+    sold: "terjual",
+    stock: "Stok",
+    variant: "Varian",
+    placeOrder: "Buat Pesanan",
+    pay: "Bayar",
+    orders: "Pesanan",
+    products: "Produk",
+    settings: "Pengaturan",
+    logout: "Keluar",
+    orderSuccess: "Pesanan dibuat!",
+    cartEmpty: "Keranjang kosong — ayo pilih rasa favoritmu!",
+    continueShopping: "Lanjut belanja",
+  },
+} as const
+
+export type Locale = keyof typeof dict
