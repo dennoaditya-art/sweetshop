@@ -58,7 +58,7 @@ export function HomeScenes({ products, categories }: { products: Product[]; cate
       // entrance - immediate, not tied to scroll
       const tl = gsap.timeline()
       tl.from("[data-hero-badge]", { y: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 0)
-        .from("[data-hero-h1] span", { y: 40, opacity: 0, stagger: 0.08, duration: 0.6, ease: "power3.out" }, 0.1)
+        .from("[data-hero-h1] > span > span", { y: 40, opacity: 0, stagger: 0.08, duration: 0.6, ease: "power3.out" }, 0.1)
         .from("[data-hero-desc]", { y: 16, opacity: 0, duration: 0.4, ease: "power2.out" }, 0.35)
         .from("[data-hero-cta] > *", { y: 16, opacity: 0, stagger: 0.06, duration: 0.4, ease: "power2.out" }, 0.45)
         .from("[data-hero-scoop-card]", { scale: 0.92, y: 30, opacity: 0, duration: 0.7, ease: "power3.out" }, 0.2)
@@ -160,10 +160,10 @@ export function HomeScenes({ products, categories }: { products: Product[]; cate
             <span data-hero-badge className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase px-3 py-1.5 rounded-full bg-white border border-[var(--border)] shadow-sm">
               <span className="w-2 h-2 rounded-full rhinestone animate-pulse" /> {siteConfig.hero.badge}
             </span>
-            <h1 data-hero-h1 className="text-5xl sm:text-6xl font-bold leading-[0.95] tracking-tight overflow-hidden" style={{ fontFamily: "var(--font-display)" }}>
-              <span className="block">{siteConfig.hero.titleLine1}</span>
-              <span className="glaze-text block">{siteConfig.hero.titleLine2}</span>
-              <span data-hero-desc className="block text-3xl sm:text-4xl font-medium text-[var(--muted-foreground)] mt-2">{siteConfig.hero.titleLine3}</span>
+            <h1 data-hero-h1 className="text-5xl sm:text-6xl font-bold leading-[0.95] tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+              <span className="block overflow-hidden"><span className="block">{siteConfig.hero.titleLine1}</span></span>
+              <span className="glaze-text block overflow-hidden"><span className="block">{siteConfig.hero.titleLine2}</span></span>
+              <span className="block overflow-hidden"><span data-hero-subtitle className="block text-3xl sm:text-4xl font-medium text-[var(--muted-foreground)] mt-2">{siteConfig.hero.titleLine3}</span></span>
             </h1>
             <p data-hero-desc className="text-[var(--muted-foreground)] max-w-md">{siteConfig.hero.description}</p>
             <div data-hero-cta className="flex flex-wrap gap-3">
