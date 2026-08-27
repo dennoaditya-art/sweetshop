@@ -52,31 +52,32 @@ export function HomeScenes({ products, categories }: { products: Product[]; cate
     }
     if (reduced) return
 
-    // HERO — pinned video scrub (2x height = video duration)
+    // HERO — entrance plays immediately (no scrub), then gentle parallax on scroll
+    // ponytail: pin removed — scrubbed pin hid caption until scroll, fatal for first impression
     if (heroRef.current) {
-      const tl = gsap.timeline({
-        scrollTrigger: { trigger: heroRef.current, start: "top top", end: "+=120%", scrub: 1, pin: true, anticipatePin: 1 },
-      })
-      tl.from("[data-hero-badge]", { y: -30, opacity: 0, duration: 0.4 }, 0)
-        .from("[data-hero-h1] span", { y: 80, opacity: 0, stagger: 0.12, duration: 0.6, ease: "power3.out" }, 0.1)
-        .from("[data-hero-desc]", { y: 20, opacity: 0, duration: 0.4 }, 0.4)
-        .from("[data-hero-cta] > *", { y: 20, opacity: 0, stagger: 0.08, duration: 0.3 }, 0.5)
-        // scoop builds like video frames — scale + rotation scrubbed
-        .from("[data-hero-scoop-card]", { scale: 0.7, rotation: -8, y: 60, duration: 0.8, ease: "power2.out" }, 0.2)
-        .from("[data-hero-scoop] [data-scoop]", { scale: 0, rotation: -20, stagger: 0.08, duration: 0.5, ease: "back.out(1.7)" }, 0.3)
-      // parallax while scrubbing
+      // entrance - immediate, not tied to scroll
+      const tl = gsap.timeline()
+      tl.from("[data-hero-badge]", { y: -20, opacity: 0, duration: 0.5, ease: "power2.out" }, 0)
+        .from("[data-hero-h1] span", { y: 40, opacity: 0, stagger: 0.08, duration: 0.6, ease: "power3.out" }, 0.1)
+        .from("[data-hero-desc]", { y: 16, opacity: 0, duration: 0.4, ease: "power2.out" }, 0.35)
+        .from("[data-hero-cta] > *", { y: 16, opacity: 0, stagger: 0.06, duration: 0.4, ease: "power2.out" }, 0.45)
+        .from("[data-hero-scoop-card]", { scale: 0.92, y: 30, opacity: 0, duration: 0.7, ease: "power3.out" }, 0.2)
+        .from("[data-hero-scoop] [data-scoop]", { scale: 0, rotation: -10, stagger: 0.07, duration: 0.45, ease: "back.out(1.5)" }, 0.35)
+      // subtle parallax while scrolling - no pin, caption stays visible
       gsap.to("[data-hero-scoop-card]", {
-        y: -40, rotation: 2,
+        y: -24, rotation: 1,
+        ease: "none",
         scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: 1 },
       })
       gsap.to("[data-hero-arc]", {
-        scale: 1.25, x: 20,
-        scrollTrigger: { trigger: heroRef.current, start: "top top", end: "+=120%", scrub: 1 },
+        scale: 1.12, x: 12,
+        ease: "none",
+        scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: 1 },
       })
-      // viewfinder shutter lines scrub
       gsap.to("[data-shutter]", {
-        opacity: 0.15,
-        scrollTrigger: { trigger: heroRef.current, start: "top top", end: "+=120%", scrub: 1 },
+        opacity: 0.08,
+        ease: "none",
+        scrollTrigger: { trigger: heroRef.current, start: "top top", end: "bottom top", scrub: 1 },
       })
     }
 
