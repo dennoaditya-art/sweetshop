@@ -12,6 +12,8 @@ export default async function Home() {
     prisma.product.findMany({ include: { category: true }, orderBy: { createdAt: "desc" } }),
     prisma.category.findMany({ orderBy: { id: "asc" } }),
   ])
+  // keep premium loading visible longer — adjust 1800ms to taste
+  await new Promise((r) => setTimeout(r, 1800))
   const products = rawProducts.map(parseProduct)
   return (
     <div className="flex flex-col min-h-screen">

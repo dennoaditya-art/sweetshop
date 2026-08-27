@@ -18,6 +18,7 @@ export default async function MenuPage({ searchParams }: { searchParams: Promise
     prisma.product.findMany({ where, include: { category: true }, orderBy: { createdAt: "desc" } }),
     prisma.category.findMany({ orderBy: { id: "asc" } }),
   ])
+  await new Promise((r) => setTimeout(r, 1400))
   const products = rawProducts.map(parseProduct)
   return (
     <div className="flex flex-col min-h-screen">
