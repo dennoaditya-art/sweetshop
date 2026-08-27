@@ -35,29 +35,29 @@ const products = [
   {
     id: "3", name: "Bubblegum Dream Shake", slug: "bubblegum-dream-shake",
     description: "Milkshake bubblegum pink dengan marshmallow dan sprinkle pelangi.",
-    price: 35000, image: "https://images.unsplash.com/photo-1579954115545-a95591f99d40?w=600&q=80",
-    images: ["https://images.unsplash.com/photo-1579954115545-a95591f99d40?w=600&q=80"],
+    price: 35000, image: "https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=600&q=80",
+    images: ["https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=600&q=80"],
     category: "drink", tags: ["bubblegum","milkshake"], rating: 4.7, sold: 634, isBestSeller: true, stock: 40,
   },
   {
     id: "4", name: "Taro Mochi Scoop", slug: "taro-mochi-scoop",
     description: "Es krim taro ungu lembut dengan mochi kenyal di dalamnya.",
-    price: 32000, image: "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&q=80",
-    images: ["https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=600&q=80"],
+    price: 32000, image: "https://images.unsplash.com/photo-1553531889-56cc480ac5cb?w=600&q=80",
+    images: ["https://images.unsplash.com/photo-1553531889-56cc480ac5cb?w=600&q=80"],
     category: "ice-cream", tags: ["taro","mochi","lavender"], rating: 4.8, sold: 521, stock: 25,
   },
   {
     id: "5", name: "Choco Lava Sundae", slug: "choco-lava-sundae",
     description: "Sundae coklat dengan lava sauce lumer dan brownie crumble.",
-    price: 38000, image: "https://images.unsplash.com/photo-1488900128323-21503983a07e?w=600&q=80",
-    images: ["https://images.unsplash.com/photo-1488900128323-21503983a07e?w=600&q=80"],
+    price: 38000, image: "https://images.pexels.com/photos/2693447/pexels-photo-2693447.jpeg",
+    images: ["https://images.pexels.com/photos/2693447/pexels-photo-2693447.jpeg"],
     category: "sundae", tags: ["coklat","lava"], rating: 4.9, sold: 743, isBestSeller: true, stock: 35,
   },
   {
     id: "6", name: "Mango Sunset Panna Cotta", slug: "mango-sunset-panna-cotta",
     description: "Panna cotta mangga dengan layer jelly sunset yang cantik.",
-    price: 30000, image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=600&q=80",
-    images: ["https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=600&q=80"],
+    price: 30000, image: "https://images.pexels.com/photos/1352281/pexels-photo-1352281.jpeg",
+    images: ["https://images.pexels.com/photos/1352281/pexels-photo-1352281.jpeg"],
     category: "dessert", tags: ["mango","panna-cotta"], rating: 4.6, sold: 312, stock: 20,
   },
   {
@@ -93,15 +93,15 @@ const products = [
   {
     id: "11", name: "Lychee Rose Milk Tea", slug: "lychee-rose-milk-tea",
     description: "Milk tea lychee dengan aroma rose dan boba kenyal.",
-    price: 28000, image: "https://images.unsplash.com/photo-1544148103-0828576c6d18?w=600&q=80",
-    images: ["https://images.unsplash.com/photo-1544148103-0828576c6d18?w=600&q=80"],
+    price: 28000, image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&q=80",
+    images: ["https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&q=80"],
     category: "drink", tags: ["lychee","rose"], rating: 4.5, sold: 298, stock: 35,
   },
   {
     id: "12", name: "Strawberry Cheesecake Box", slug: "strawberry-cheesecake-box",
     description: "Dessert box cheesecake strawberry dengan crumble biscuit.",
-    price: 36000, image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&q=80",
-    images: ["https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&q=80"],
+    price: 36000, image: "https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg",
+    images: ["https://images.pexels.com/photos/1099680/pexels-photo-1099680.jpeg"],
     category: "dessert", tags: ["strawberry","cheesecake"], rating: 4.8, sold: 512, stock: 22,
   },
 ]
@@ -120,3 +120,4 @@ async function main() {
   console.log("Seed done")
 }
 main().catch((e) => { console.error(e); process.exit(1) }).finally(() => prisma.$disconnect())
+

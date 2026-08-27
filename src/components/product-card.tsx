@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import { useState } from "react"
 import { formatPrice } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -9,10 +10,16 @@ import { Star, ShoppingBag } from "lucide-react"
 
 export function ProductCard({ product }: { product: Product }) {
   const { addToCart, openCart } = useStore()
+  const [failed, setFailed] = useState(false)
+  const fallback = "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=600&q=80"
   return (
     <div className="glass-card rounded-[1.5rem] overflow-hidden flex flex-col group hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
       <Link href={`/produk/${product.slug}`} className="relative aspect-square overflow-hidden bg-[var(--muted)]">
-        <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+        {failed ? (
+          <div className="w-full h-full flex items-center justify-center bg-[var(--muted)] text-4xl">🍦</div>
+        ) : (
+          <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onError={() => setFailed(true)} />
+        )}
         <div className="absolute top-3 left-3 flex gap-1.5">
           {product.isBestSeller && <Badge className="bg-[var(--primary)] text-white border-0">Best Seller</Badge>}
           {product.isNew && <Badge className="bg-[var(--secondary)] text-[var(--secondary-foreground)] border-0">Baru</Badge>}
