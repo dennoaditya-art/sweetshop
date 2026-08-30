@@ -31,9 +31,9 @@ export default async function PesananPage({ params, searchParams }: { params: Pr
           <div className="mx-auto w-20 h-20 rounded-full bg-green-100 border-4 border-green-200 flex items-center justify-center shadow-lg" style={{ boxShadow: "0 8px 24px rgba(34,197,94,0.25)" }}>
             <CheckCircle className="w-10 h-10 text-green-600" />
           </div>
-          <h1 className="text-3xl font-bold mt-4" style={{ fontFamily: "var(--font-display)" }}>{isPaid ? "Pesanan Berhasil! 🎉" : "Pesanan Diterima!"}</h1>
+          <h1 className="text-3xl font-bold mt-4" style={{ fontFamily: "var(--font-display)" }}>Pesanan Berhasil! 🎉</h1>
           <p className="text-sm text-[var(--muted-foreground)] mt-2 max-w-md mx-auto">
-            {isPaid ? "Pembayaran kamu terkonfirmasi. Kami sedang siapkan es krim glossy-mu!" : "Terima kasih! Pesanan kamu sudah masuk. Selesaikan pembayaran untuk diproses."}
+            {isPaid ? "Pembayaran kamu terkonfirmasi. Kami sedang siapkan es krim glossy-mu!" : "Terima kasih! Pesanan kamu sudah masuk — tim kami akan proses segera."}
           </p>
           <div className="mt-3 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--card)] border border-[var(--border)] text-sm">
             <span className="text-[var(--muted-foreground)]">ID</span>

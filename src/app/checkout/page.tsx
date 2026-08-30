@@ -79,9 +79,9 @@ export default function CheckoutPage() {
       if (!tokenRes.ok) throw new Error(tokenData.error)
 
       if (tokenData.isMock) {
-        // mock: langsung anggap sukses
+        // mock: langsung anggap sukses — sertakan paid=1 agar badge Lunas
         clearCart()
-        router.push(`/pesanan/${data.order.id}?phone=${encodeURIComponent(form.phone)}`)
+        router.push(`/pesanan/${data.order.id}?phone=${encodeURIComponent(form.phone)}&paid=1`)
         return
       }
 
