@@ -2,10 +2,17 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getSession } from "@/lib/session"
 
-export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const { searchParams } = new URL(request.url)
+  const phone = searchParams.get("phone")
+  const session = await getSession()
   const order = await prisma.order.findUnique({ where: { id }, include: { items: true } })
-  if (!order) return NextResponse.json({ error: "Pesanan tidak ditemukan" }, { status: 404 })
+  if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 })
+  // ponytail: allow owner via phone token or admin session; otherwise private
+  if (!session && phone !== order.customerPhone) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
   return NextResponse.json({ order })
 }
 

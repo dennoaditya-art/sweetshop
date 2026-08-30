@@ -20,6 +20,27 @@
   --radius: 1rem;
 }
 
+/* Dark mode */
+.dark {
+  /* Dark palette - Nail Art Fresh inverted */
+  --background: #1A0F12;
+  --foreground: #F5E6EB;
+  --primary: #FF6B9D;
+  --primary-foreground: #1A0F12;
+  --secondary: #2D4B3A;
+  --secondary-foreground: #A8E6CF;
+  --accent: #6A4D80;
+  --accent-foreground: #F5E6EB;
+  --muted: #2D1A1E;
+  --muted-foreground: #A88593;
+  --border: #4A2F38;
+  --input: #4A2F38;
+  --ring: #FF6B9D;
+  --card: #231318;
+  --card-foreground: #F5E6EB;
+  --radius: 1rem;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -43,6 +64,8 @@
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-display);
 }
+
+/* DESIGN TOKEN RULE — do not use bg-white directly (breaks dark mode). Use bg-[var(--card)] + text-[var(--card-foreground)] or bg-[var(--primary)] + text-[var(--primary-foreground)]. Hero light section (hero-badge) is the only allowlist with bg-white + text-[#2D1A1E]. Enforced by npm run lint:tokens */
 
 * { border-color: var(--border); }
 
@@ -77,10 +100,25 @@ body {
   box-shadow: 0 8px 32px rgba(255,107,157,0.12), 0 2px 8px rgba(255,107,157,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
 }
 
+/* Dark mode glass card */
+.dark .glass-card {
+  background: rgba(35,19,24,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(74,47,56,0.6);
+  box-shadow: 0 8px 32px rgba(255,107,157,0.12), 0 2px 8px rgba(255,107,157,0.08), inset 0 1px 0 rgba(35,25,30,0.9);
+}
+
 /* Rhinestone dot */
 .rhinestone {
   background: radial-gradient(circle at 30% 30%, #fff, #FFD3E0 40%, #FF6B9D 100%);
   box-shadow: 0 1px 4px rgba(255,107,157,0.4), inset 0 1px 1px rgba(255,255,255,0.8);
+}
+
+/* Dark mode rhinestone */
+.dark .rhinestone {
+  background: radial-gradient(circle at 30% 30%, #1A0F12, #4A2F38 40%, #FF6B9D 100%);
+  box-shadow: 0 1px 4px rgba(255,107,157,0.4), inset 0 1px 1px rgba(23,19,24,0.8);
 }
 
 /* French tip arc */
@@ -92,6 +130,10 @@ body {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--muted); }
 ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 999px; }
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track { background: var(--muted); }
+.dark ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 999px; }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {

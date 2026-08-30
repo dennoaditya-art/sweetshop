@@ -10,11 +10,15 @@ export async function POST(request: Request) {
     const order = await prisma.order.findUnique({ where: { id: orderId }, include: { items: true } })
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 })
 
+    // extract email from customerNotes if stored as "Email: x | notes"
+    const emailMatch = order.customerNotes?.match(/Email:\s*([^\s|]+@[^\s|]+)/)
+    const customerEmail = emailMatch?.[1]
     const result = await createPaymentToken({
       orderId: order.id,
       total: order.total,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
+      customerEmail,
       items: order.items.map((it) => ({ productId: it.productId, productName: it.productName, variant: it.variant, price: it.productPrice, quantity: it.quantity })),
     })
 
@@ -24,7 +28,7 @@ export async function POST(request: Request) {
       include: { items: true },
     })
 
-    return NextResponse.json({ snapToken: result.snapToken, order: updated, isMock: result.isMock, provider: result.provider })
+    return NextResponse.json({ snapToken: result.snapToken, order: updated, isMock: result.isMock, provider: result.provider, url: (result as any).url })
   } catch (e: any) {
     console.error(e)
     return NextResponse.json({ error: e.message ?? "Failed to create payment token" }, { status: 500 })

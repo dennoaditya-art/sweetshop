@@ -68,7 +68,7 @@ function FrameComponent({
       style={{
         width,
         height,
-        transition: "width 0.3s ease-in-out, height 0.3s ease-in-out",
+        transition: "transform 0.3s ease-in-out, opacity 0.3s ease-in-out",
       }}
     >
       <div className="relative w-full h-full overflow-hidden">
@@ -85,11 +85,11 @@ function FrameComponent({
           }}
         >
           <div
-            className="w-full h-full overflow-hidden"
+            className="w-full h-full overflow-hidden will-change-transform"
             style={{
               transform: `scale(${mediaSize})`,
               transformOrigin: "center",
-              transition: "transform 0.3s ease-in-out",
+              transition: "transform 0.3s ease-out-expo, opacity 0.3s ease",
             }}
           >
             {failed ? (
@@ -105,7 +105,7 @@ function FrameComponent({
                 loop
                 muted
                 playsInline
-                preload="metadata"
+                preload="none"
                 poster={fallback ?? "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=60"}
                 ref={videoRef}
                 onError={() => setFailed(true)}

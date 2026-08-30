@@ -5,13 +5,17 @@ import { formatPrice } from "@/lib/utils"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { getSession } from "@/lib/session"
 
 export const dynamic = "force-dynamic"
 
-export default async function PesananPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function PesananPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams?: Promise<{ phone?: string }> }) {
   const { id } = await params
+  const { phone } = (await searchParams) ?? {}
+  const session = await getSession()
   const order = await prisma.order.findUnique({ where: { id }, include: { items: true } })
   if (!order) notFound()
+  if (!session && phone !== order.customerPhone) notFound()
   return (
     <div className="flex flex-col min-h-screen">
       <Header />

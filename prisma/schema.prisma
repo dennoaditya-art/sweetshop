@@ -84,3 +84,14 @@ model SiteConfig {
   value     String
   updatedAt DateTime @updatedAt
 }
+
+model AbandonedCart {
+  id        String   @id @default(cuid())
+  email     String
+  items     String   // JSON string of cart items
+  total     Float
+  recovered Boolean  @default(false)
+  notifiedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

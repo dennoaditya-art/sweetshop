@@ -26,16 +26,16 @@ export default async function MenuPage({ searchParams }: { searchParams: Promise
       <main className="flex-1 mx-auto max-w-6xl px-4 py-8 w-full">
         <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>Menu <span className="glaze-text">{siteConfig.name}</span></h1>
         <div className="flex flex-wrap gap-2 mt-4">
-          <Link href="/menu" className={`px-4 py-2 rounded-full text-sm font-medium border ${!kategori ? "bg-[var(--primary)] text-white border-[var(--primary)]" : "bg-white border-[var(--border)]"}`}>All</Link>
+          <Link href="/menu" className={`px-4 py-2 rounded-full text-sm font-medium border ${!kategori ? "bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]" : "bg-[var(--card)] text-[var(--card-foreground)] border-[var(--border)]"}`}>All</Link>
           {categories.map((c) => (
-            <Link key={c.id} href={`/menu?kategori=${c.id}`} className={`px-4 py-2 rounded-full text-sm font-medium border flex items-center gap-1.5 ${kategori === c.id ? "bg-[var(--primary)] text-white border-[var(--primary)]" : "bg-white border-[var(--border)]"}`}>
+            <Link key={c.id} href={`/menu?kategori=${c.id}`} className={`px-4 py-2 rounded-full text-sm font-medium border flex items-center gap-1.5 ${kategori === c.id ? "bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]" : "bg-[var(--card)] text-[var(--card-foreground)] border-[var(--border)]"}`}>
               <span>{c.emoji}</span> {c.name}
             </Link>
           ))}
         </div>
         <form action="/menu" className="mt-4 flex gap-2 max-w-md">
-          <input name="q" defaultValue={q ?? ""} placeholder="Search flavors..." className="flex-1 h-10 rounded-full border border-[var(--border)] bg-white px-4 text-sm" />
-          <button type="submit" className="h-10 px-6 rounded-full bg-[var(--primary)] text-white text-sm font-semibold">Search</button>
+          <input name="q" defaultValue={q ?? ""} placeholder="Search flavors..." className="flex-1 h-10 rounded-full border border-[var(--border)] bg-[var(--card)] text-[var(--card-foreground)] placeholder:text-[var(--muted-foreground)] px-4 text-sm" />
+          <button type="submit" className="h-10 px-6 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] text-sm font-semibold">Search</button>
         </form>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
           {products.map((p) => <ProductCard key={p.id} product={p} />)}

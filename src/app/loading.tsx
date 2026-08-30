@@ -5,7 +5,7 @@ export default function Loading() {
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "linear-gradient(180deg, #FFF9F5 0%, #FFF0E6 60%, #FFE6EF 100%)" }}>
       {/* header skeleton */}
-      <div className="h-16 border-b border-[var(--border)] bg-white/70 backdrop-blur-xl flex items-center px-4">
+      <div className="h-16 border-b border-[var(--border)] bg-[var(--card)]/70 backdrop-blur-xl flex items-center px-4">
         <div className="mx-auto max-w-6xl w-full flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-full bg-[var(--primary)]/20 animate-pulse" />
@@ -24,7 +24,7 @@ export default function Loading() {
       <div className="flex-1 flex items-center justify-center p-6 sm:p-8">
         <div className="glass-card rounded-[2rem] p-8 sm:p-10 flex flex-col items-center gap-6 max-w-sm w-full text-center shadow-xl">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-[var(--primary)] flex items-center justify-center text-white shadow-lg">
+            <div className="w-16 h-16 rounded-full bg-[var(--primary)] flex items-center justify-center text-[var(--primary-foreground)] shadow-lg">
               <Sparkles className="w-8 h-8" />
             </div>
             <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full rhinestone animate-ping opacity-75" />

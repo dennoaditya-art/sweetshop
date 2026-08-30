@@ -1,10 +1,12 @@
 import { paymentConfig, type PaymentProvider } from "@/config/payment"
+import { siteConfig } from "@/config/site"
 
 export interface CreateTokenInput {
   orderId: string
   total: number
   customerName: string
   customerPhone: string
+  customerEmail?: string
   items: { productId: string; productName: string; variant?: string | null; price: number; quantity: number }[]
 }
 
@@ -13,15 +15,52 @@ export interface CreateTokenResult {
   midtransOrderId: string
   isMock: boolean
   provider: PaymentProvider
+  url?: string
+}
+
+const ZERO_DECIMAL = new Set(["JPY", "KRW", "VND", "IDR", "BIF", "CLP", "DJF", "GNF", "KMF", "MGA", "PYG", "RWF", "UGX", "VUV", "XAF", "XOF", "XPF"])
+
+function toStripeAmount(amount: number, currency: string): number {
+  const c = currency.toUpperCase()
+  if (ZERO_DECIMAL.has(c)) return Math.round(amount)
+  return Math.round(amount * 100)
 }
 
 export async function createPaymentToken(input: CreateTokenInput): Promise<CreateTokenResult> {
   const provider = paymentConfig.provider
   const midtransOrderId = `${input.orderId}-${Date.now()}`
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || siteConfig.siteUrl
 
-  if (provider === "mock" || provider === "stripe") {
-    // stripe stub behaves like mock until buyer wires real Stripe
-    // ponytail: keep one code path, no heavy Stripe SDK until needed
+  // Stripe — real Checkout Session (international, no domain required beyond vercel.app)
+  if (provider === "stripe") {
+    const secretKey = process.env.STRIPE_SECRET_KEY ?? paymentConfig.stripe.secretKey
+    if (!secretKey || secretKey.includes("dummy") || secretKey.includes("xxxxx")) {
+      // No keys in dev → graceful mock, buyer sees real Stripe after setting keys
+      return { snapToken: `mock-snap-${midtransOrderId}`, midtransOrderId, isMock: true, provider }
+    }
+    const { default: Stripe } = await import("stripe")
+    const stripe = new Stripe(secretKey)
+    const currency = (paymentConfig.currency || "USD").toLowerCase()
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      success_url: `${siteUrl}/pesanan/${input.orderId}?phone=${encodeURIComponent(input.customerPhone)}&paid=1`,
+      cancel_url: `${siteUrl}/checkout?canceled=1`,
+      customer_email: input.customerEmail || undefined,
+      line_items: input.items.map((it) => ({
+        quantity: it.quantity,
+        price_data: {
+          currency,
+          product_data: { name: it.productName + (it.variant ? ` (${it.variant})` : "") },
+          unit_amount: toStripeAmount(it.price, currency),
+        },
+      })),
+      metadata: { orderId: input.orderId, midtransOrderId },
+      phone_number_collection: { enabled: false },
+    })
+    return { snapToken: session.id, midtransOrderId, isMock: false, provider: "stripe", url: session.url ?? undefined }
+  }
+
+  if (provider === "mock") {
     return { snapToken: `mock-snap-${midtransOrderId}`, midtransOrderId, isMock: true, provider }
   }
 

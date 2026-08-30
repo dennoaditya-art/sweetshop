@@ -1,5 +1,5 @@
 "use client"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { formatPrice } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -7,7 +7,7 @@ import { Input, Textarea } from "@/components/ui/input"
 import { siteConfig as defaultSiteConfig } from "@/config/site"
 import type { Category } from "@/types"
 
-type Tab = "orders" | "products" | "settings"
+type Tab = "orders" | "products" | "settings" | "abandoned"
 
 export function AdminClient({
   products: initialProducts,
@@ -33,6 +33,13 @@ export function AdminClient({
     footerText: String(defaultSiteConfig.footerText),
     contactEmail: String(defaultSiteConfig.contactEmail),
   })
+  const [abandoned, setAbandoned] = useState<any[]>([])
+  useEffect(() => {
+    if (!showAdd) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setShowAdd(false); setEditing(null) } }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [showAdd])
   const router = useRouter()
 
   async function logout() {
@@ -51,6 +58,7 @@ export function AdminClient({
     }
   }
 
+  const [visibleCount, setVisibleCount] = useState(20)
   const filteredOrders = useMemo(() => {
     let r = orders
     if (statusFilter !== "all") r = r.filter((o) => o.status === statusFilter)
@@ -65,6 +73,7 @@ export function AdminClient({
     }
     return r
   }, [orders, q, statusFilter])
+  const visibleOrders = filteredOrders.slice(0, visibleCount)
 
   async function handleSaveProduct(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -129,16 +138,22 @@ export function AdminClient({
     else alert("Failed to save")
   }
 
+  async function loadAbandoned() {
+    const res = await fetch("/api/abandoned-cart?limit=20")
+    if (res.ok) { const d = await res.json(); setAbandoned(d.abandoned ?? []) }
+  }
+
   return (
     <div className="min-h-screen bg-[var(--muted)]/30">
-      <header className="sticky top-0 z-10 bg-white border-b border-[var(--border)] flex items-center justify-between px-4 h-14">
+      <header className="sticky top-0 z-10 bg-[var(--card)] border-b border-[var(--border)] flex items-center justify-between px-4 h-14">
         <p className="font-bold" style={{ fontFamily: "var(--font-display)" }}>
           {defaultSiteConfig.name} Admin
         </p>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={() => setTab("orders")} className={`px-4 py-1.5 rounded-full text-sm font-medium border ${tab === "orders" ? "bg-[var(--primary)] text-white border-[var(--primary)]" : "bg-white"}`}>Orders</button>
-          <button onClick={() => setTab("products")} className={`px-4 py-1.5 rounded-full text-sm font-medium border ${tab === "products" ? "bg-[var(--primary)] text-white border-[var(--primary)]" : "bg-white"}`}>Products</button>
-          <button onClick={() => setTab("settings")} className={`px-4 py-1.5 rounded-full text-sm font-medium border ${tab === "settings" ? "bg-[var(--primary)] text-white border-[var(--primary)]" : "bg-white"}`}>Settings</button>
+          <button onClick={() => setTab("orders")} className={`px-4 py-1.5 rounded-full text-sm font-medium border ${tab === "orders" ? "bg-[var(--primary)] text-white border-[var(--primary)]" : "bg-[var(--card)]"}`}>Orders</button>
+          <button onClick={() => setTab("products")} className={`px-4 py-1.5 rounded-full text-sm font-medium border ${tab === "products" ? "bg-[var(--primary)] text-white border-[var(--primary)]" : "bg-[var(--card)]"}`}>Products</button>
+          <button onClick={() => { setTab("abandoned"); loadAbandoned() }} className={`px-4 py-1.5 rounded-full text-sm font-medium border ${tab === "abandoned" ? "bg-[var(--primary)] text-white border-[var(--primary)]" : "bg-[var(--card)]"}`}>Abandoned</button>
+          <button onClick={() => setTab("settings")} className={`px-4 py-1.5 rounded-full text-sm font-medium border ${tab === "settings" ? "bg-[var(--primary)] text-white border-[var(--primary)]" : "bg-[var(--card)]"}`}>Settings</button>
           <Button variant="outline" size="sm" onClick={logout}>Logout</Button>
         </div>
       </header>
@@ -150,7 +165,7 @@ export function AdminClient({
               <h2 className="text-lg font-bold">Orders ({filteredOrders.length}/{orders.length})</h2>
               <div className="flex gap-2">
                 <Input placeholder="Search name/phone/id" value={q} onChange={(e) => setQ(e.target.value)} className="h-8 w-44" />
-                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-8 rounded-full border border-[var(--border)] bg-white px-3 text-xs">
+                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-8 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 text-xs">
                   <option value="all">All status</option>
                   <option value="baru">baru</option>
                   <option value="diproses">diproses</option>
@@ -159,7 +174,7 @@ export function AdminClient({
                 </select>
               </div>
             </div>
-            {filteredOrders.map((o) => (
+            {visibleOrders.map((o) => (
               <div key={o.id} className="glass-card rounded-2xl p-4 space-y-2">
                 <div className="flex flex-wrap justify-between gap-2">
                   <p className="font-mono text-xs">#{o.id.slice(0, 8)} · {new Date(o.createdAt).toLocaleString("en-US")}</p>
@@ -174,16 +189,18 @@ export function AdminClient({
                 </div>
                 <p className="font-bold">Total {formatPrice(o.total)}</p>
                 <div className="flex flex-wrap gap-2">
-                  <select value={o.status} onChange={(e) => updateOrder(o.id, { status: e.target.value })} className="h-8 rounded-full border border-[var(--border)] bg-white px-3 text-xs">
+                  <select value={o.status} onChange={(e) => updateOrder(o.id, { status: e.target.value })} className="h-8 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 text-xs">
                     <option value="baru">baru</option><option value="diproses">diproses</option><option value="selesai">selesai</option><option value="batal">batal</option>
                   </select>
-                  <select value={o.paymentStatus} onChange={(e) => updateOrder(o.id, { paymentStatus: e.target.value })} className="h-8 rounded-full border border-[var(--border)] bg-white px-3 text-xs">
+                  <select value={o.paymentStatus} onChange={(e) => updateOrder(o.id, { paymentStatus: e.target.value })} className="h-8 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 text-xs">
                     <option value="pending">pending</option><option value="paid">paid</option><option value="failed">failed</option>
                   </select>
                 </div>
               </div>
             ))}
             {filteredOrders.length === 0 && <p className="text-sm text-[var(--muted-foreground)] text-center py-8">No orders found.</p>}
+            {visibleOrders.length < filteredOrders.length && <div className="text-center"><Button variant="outline" size="sm" onClick={()=> setVisibleCount(c=> c+20)}>Load more ({filteredOrders.length - visibleOrders.length} remaining)</Button></div>}
+            {orders.length===100 && <p className="text-xs text-center text-[var(--muted-foreground)]">Showing latest 100 — add pagination via <code>skip/take</code> in <code>src/app/admin/page.tsx</code></p>}
           </div>
         )}
 
@@ -199,11 +216,11 @@ export function AdminClient({
                   <img src={p.image} alt={p.name} className="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold leading-tight">{p.name}</p>
-                    <p className="text-xs text-[var(--muted-foreground)]">{p.category?.name ?? p.categoryId} · Stock {p.stock}</p>
+                    <p className="text-xs text-[var(--muted-foreground)]">{p.category?.name ?? p.categoryId} · Stock {p.stock} {p.stock <= 5 && p.stock > 0 ? "⚠️ Low" : ""} {p.stock === 0 ? "❌ Out" : ""}</p>
                     <p className="text-sm font-bold text-[var(--primary)]">{formatPrice(p.price)}</p>
                     <div className="flex gap-2 mt-2">
-                      <button onClick={() => { setEditing(p); setShowAdd(true) }} className="text-xs px-3 py-1 rounded-full border bg-white hover:bg-[var(--muted)]">Edit</button>
-                      <button onClick={() => handleDelete(p.id)} className="text-xs px-3 py-1 rounded-full border bg-white text-red-600 hover:bg-red-50">Delete</button>
+                      <button onClick={() => { setEditing(p); setShowAdd(true) }} className="text-xs px-3 py-1 rounded-full border bg-[var(--card)] hover:bg-[var(--muted)]">Edit</button>
+                      <button onClick={() => handleDelete(p.id)} className="text-xs px-3 py-1 rounded-full border bg-[var(--card)] text-red-600 hover:bg-red-50">Delete</button>
                     </div>
                   </div>
                 </div>
@@ -211,11 +228,11 @@ export function AdminClient({
             </div>
 
             {showAdd && (
-              <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
-                <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => { setShowAdd(false); setEditing(null) }} />
-                <form onSubmit={handleSaveProduct} className="relative bg-white rounded-[1.5rem] p-6 w-full max-w-lg max-h-[90vh] overflow-auto space-y-3">
+              <div className="fixed inset-0 z-40 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={editing ? "Edit product" : "Add product"}>
+                <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => { setShowAdd(false); setEditing(null) }} aria-hidden />
+                <form onSubmit={handleSaveProduct} className="relative bg-[var(--card)] rounded-[1.5rem] p-6 w-full max-w-lg max-h-[90vh] overflow-auto space-y-3">
                   <h3 className="font-bold text-lg">{editing ? "Edit Product" : "Add Product"}</h3>
-                  <Input name="name" placeholder="Name" defaultValue={editing?.name ?? ""} required />
+                  <Input name="name" placeholder="Name" defaultValue={editing?.name ?? ""} required autoFocus />
                   <Input name="slug" placeholder="slug-like-this" defaultValue={editing?.slug ?? ""} required />
                   <Textarea name="description" placeholder="Description" defaultValue={editing?.description ?? ""} required />
                   <div className="grid grid-cols-2 gap-2">
@@ -224,7 +241,7 @@ export function AdminClient({
                   </div>
                   <Input name="image" placeholder="Image URL https://..." defaultValue={editing?.image ?? ""} required />
                   <div className="grid grid-cols-2 gap-2">
-                    <select name="categoryId" defaultValue={editing?.categoryId ?? categories[0]?.id ?? ""} className="h-10 rounded-full border border-[var(--border)] bg-white px-3 text-sm" required>
+                    <select name="categoryId" defaultValue={editing?.categoryId ?? categories[0]?.id ?? ""} className="h-10 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 text-sm" required>
                       {categories.map((c) => <option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}
                     </select>
                     <Input name="stock" type="number" placeholder="Stock" defaultValue={editing?.stock ?? 10} />
@@ -245,6 +262,20 @@ export function AdminClient({
                 </form>
               </div>
             )}
+          </div>
+        )}
+
+        {tab === "abandoned" && (
+          <div className="space-y-3">
+            <div className="flex justify-between items-center"><h2 className="text-lg font-bold">Abandoned Carts ({abandoned.length})</h2><Button size="sm" variant="outline" onClick={loadAbandoned}>Refresh</Button></div>
+            <p className="text-xs text-[var(--muted-foreground)]">Tanpa domain: recovery manual via WA/Email. Dengan domain + RESEND_API_KEY: auto-email aktif. <a href={`data:text/csv;charset=utf-8,${encodeURIComponent("email,total,items,createdAt\n" + abandoned.map((a:any)=> `${a.email},${a.total},"${String(a.items).replace(/"/g,'""')}",${a.createdAt}`).join("\n"))}`} download="abandoned.csv" className="underline text-[var(--primary)]">Download CSV</a></p>
+            {abandoned.map((a:any)=> (
+              <div key={a.id} className="glass-card rounded-2xl p-4 flex flex-wrap justify-between gap-2">
+                <div><p className="text-sm font-semibold">{a.email}</p><p className="text-xs text-[var(--muted-foreground)]">{new Date(a.createdAt).toLocaleString()} · {formatPrice(a.total)}</p><p className="text-xs mt-1 line-clamp-2">{String(a.items).slice(0,120)}</p></div>
+                <div className="flex gap-2 self-start"><a href={`https://wa.me/?text=${encodeURIComponent(`Hi! You left ${String(a.items).slice(0,60)} in your cart — complete at ${defaultSiteConfig.siteUrl}`)}`} target="_blank" className="text-xs px-3 py-1 rounded-full border bg-[var(--card)] hover:bg-[var(--muted)]">WA</a><a href={`mailto:${a.email}?subject=${encodeURIComponent("You left something sweet 🍦")}&body=${encodeURIComponent(`Hi! Complete your order: ${defaultSiteConfig.siteUrl}/checkout`)}`} className="text-xs px-3 py-1 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)]">Email</a></div>
+              </div>
+            ))}
+            {abandoned.length===0 && <p className="text-sm text-[var(--muted-foreground)] text-center py-8">No abandoned carts yet.</p>}
           </div>
         )}
 

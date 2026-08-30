@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { DynamicFrameLayout } from "@/components/ui/dynamic-frame-layout"
 import type { Product, Category } from "@/types"
 import { ProductCard } from "@/components/product-card"
-import { Sparkles, ArrowRight, Heart, Play, Pause } from "lucide-react"
+import { Sparkles, ArrowRight, Heart, Pause } from "lucide-react"
 import { siteConfig } from "@/config/site"
 
 gsap.registerPlugin(ScrollTrigger)
@@ -28,17 +28,14 @@ export function HomeScenes({ products, categories }: { products: Product[]; cate
   const progressRef = useRef<HTMLDivElement>(null)
   const [activeFlavor, setActiveFlavor] = useState(0)
 
-  const fallbackImages = products.slice(0, 9).map((p) => p.image)
+  const fallbackImages = products.slice(0, 6).map((p) => p.image)
   const frames = [
-    { id: 1, video: "https://cdn.coverr.co/videos/coverr-making-an-ice-cream-sundae-1578255178700?download=1", defaultPos: { x: 0, y: 0, w: 4, h: 4 } },
-    { id: 2, video: "https://cdn.coverr.co/videos/coverr-scooping-ice-cream-1578123456789?download=1", defaultPos: { x: 4, y: 0, w: 4, h: 4 } },
-    { id: 3, video: "https://videos.pexels.com/video-files/3191570/3191570-uhd_2560_1440_25fps.mp4", defaultPos: { x: 8, y: 0, w: 4, h: 4 } },
-    { id: 4, video: "https://videos.pexels.com/video-files/18069234/18069234-uhd_1440_1440_24fps.mp4", defaultPos: { x: 0, y: 4, w: 4, h: 4 } },
-    { id: 5, video: "https://videos.pexels.com/video-files/3191570/3191570-uhd_2560_1440_25fps.mp4", defaultPos: { x: 4, y: 4, w: 4, h: 4 } },
-    { id: 6, video: "https://videos.pexels.com/video-files/18069234/18069234-uhd_1440_1440_24fps.mp4", defaultPos: { x: 8, y: 4, w: 4, h: 4 } },
-    { id: 7, video: "https://cdn.coverr.co/videos/coverr-making-an-ice-cream-sundae-1578255178700?download=1", defaultPos: { x: 0, y: 8, w: 4, h: 4 } },
-    { id: 8, video: "https://videos.pexels.com/video-files/18069234/18069234-uhd_1440_1440_24fps.mp4", defaultPos: { x: 4, y: 8, w: 4, h: 4 } },
-    { id: 9, video: "https://videos.pexels.com/video-files/3191570/3191570-uhd_2560_1440_25fps.mp4", defaultPos: { x: 8, y: 8, w: 4, h: 4 } },
+    { id: 1, video: "https://videos.pexels.com/video-files/3191570/3191570-uhd_2560_1440_25fps.mp4", defaultPos: { x: 0, y: 0, w: 4, h: 6 } },
+    { id: 2, video: "https://videos.pexels.com/video-files/18069234/18069234-uhd_1440_1440_24fps.mp4", defaultPos: { x: 4, y: 0, w: 4, h: 6 } },
+    { id: 3, video: "https://videos.pexels.com/video-files/18069234/18069234-uhd_1440_1440_24fps.mp4", defaultPos: { x: 8, y: 0, w: 4, h: 6 } },
+    { id: 4, video: "https://videos.pexels.com/video-files/3191570/3191570-uhd_2560_1440_25fps.mp4", defaultPos: { x: 0, y: 6, w: 4, h: 6 } },
+    { id: 5, video: "https://videos.pexels.com/video-files/3191570/3191570-uhd_2560_1440_25fps.mp4", defaultPos: { x: 4, y: 6, w: 4, h: 6 } },
+    { id: 6, video: "https://videos.pexels.com/video-files/18069234/18069234-uhd_1440_1440_24fps.mp4", defaultPos: { x: 8, y: 6, w: 4, h: 6 } },
   ].map((f, i) => ({ ...f, fallback: fallbackImages[i % fallbackImages.length] })) as any
 
   useGSAP(() => {
@@ -144,33 +141,29 @@ export function HomeScenes({ products, categories }: { products: Product[]; cate
     <div ref={containerRef} className="flex flex-col">
       {/* video progress bar */}
       <div ref={progressRef} className="fixed top-0 left-0 h-1.5 bg-[var(--primary)] z-[60] w-0" style={{ boxShadow: "0 0 8px var(--primary)" }} aria-hidden />
-      {/* video timecode */}
-      <div className="fixed top-3 right-4 z-[60] hidden sm:flex items-center gap-2 text-[10px] font-mono bg-black/70 text-white px-2.5 py-1 rounded-full backdrop-blur">
-        <Play className="w-3 h-3 fill-white" /> REC 00:00 / 00:30
-      </div>
 
       {/* SCENE 1 — Hero pinned video */}
       <section ref={heroRef} className="relative min-h-[92vh] flex items-center overflow-hidden" style={{ background: "linear-gradient(180deg, #FFF9F5 0%, #FFF0E6 60%, #FFE6EF 100%)" }}>
         {/* shutter lines */}
         <div data-shutter className="pointer-events-none absolute inset-0 opacity-0" style={{ background: "repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px)" }} />
         <div data-hero-arc className="pointer-events-none absolute -top-12 -right-12 w-[40vw] h-[40vw] rounded-full border-[24px] border-white/60" />
-        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-white french-tip opacity-60" style={{ borderRadius: "50% 50% 0 0 / 100% 100% 0 0" }} />
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-[var(--card)] french-tip opacity-60" style={{ borderRadius: "50% 50% 0 0 / 100% 100% 0 0" }} />
         <div className="mx-auto max-w-6xl px-4 py-12 w-full grid lg:grid-cols-2 gap-8 items-center">
           <div className="space-y-5">
-            <span data-hero-badge className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase px-3 py-1.5 rounded-full bg-white border border-[var(--border)] shadow-sm">
+            <span data-hero-badge className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase px-3 py-1.5 rounded-full bg-white border border-[#FFD3E0] shadow-sm text-[#2D1A1E]">
               <span className="w-2 h-2 rounded-full rhinestone animate-pulse" /> {siteConfig.hero.badge}
             </span>
-            <h1 data-hero-h1 className="text-5xl sm:text-6xl font-bold leading-[0.95] tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
-              <span className="block overflow-hidden"><span className="block">{siteConfig.hero.titleLine1}</span></span>
+            <h1 data-hero-h1 className="text-5xl sm:text-6xl font-bold leading-[0.95] tracking-tight text-[#2D1A1E]" style={{ fontFamily: "var(--font-display)" }}>
+              <span className="block overflow-hidden"><span className="block text-[#2D1A1E]">{siteConfig.hero.titleLine1}</span></span>
               <span className="glaze-text block overflow-hidden"><span className="block">{siteConfig.hero.titleLine2}</span></span>
-              <span className="block overflow-hidden"><span data-hero-subtitle className="block text-3xl sm:text-4xl font-medium text-[var(--muted-foreground)] mt-2">{siteConfig.hero.titleLine3}</span></span>
+              <span className="block overflow-hidden"><span data-hero-subtitle className="block text-3xl sm:text-4xl font-medium text-[#8B6B73] mt-2">{siteConfig.hero.titleLine3}</span></span>
             </h1>
-            <p data-hero-desc className="text-[var(--muted-foreground)] max-w-md">{siteConfig.hero.description}</p>
+            <p data-hero-desc className="text-[#8B6B73] max-w-md">{siteConfig.hero.description}</p>
             <div data-hero-cta className="flex flex-wrap gap-3">
               <Link href="/menu"><Button size="lg">View Menu <ArrowRight className="w-4 h-4" /></Button></Link>
               <Link href="#flavors"><Button variant="outline" size="lg">Explore Flavors</Button></Link>
             </div>
-            <div className="flex items-center gap-2 text-xs text-[var(--muted-foreground)]"><Heart className="w-3.5 h-3.5 text-[var(--primary)]" /> 1.2k+ happy customers this week</div>
+            <div className="flex items-center gap-2 text-xs text-[#8B6B73]"><Heart className="w-3.5 h-3.5 text-[var(--primary)]" /> 1.2k+ happy customers this week</div>
           </div>
           <div className="relative flex items-center justify-center">
             <div data-hero-scoop className="relative">
@@ -190,7 +183,7 @@ export function HomeScenes({ products, categories }: { products: Product[]; cate
           </div>
         </div>
         {/* scroll hint like video play */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-[10px] tracking-widest uppercase text-[var(--muted-foreground)] animate-bounce">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-[10px] tracking-widest uppercase text-[#8B6B73] animate-bounce">
           <Pause className="w-4 h-4" /> scroll untuk play
         </div>
       </section>
@@ -224,20 +217,20 @@ export function HomeScenes({ products, categories }: { products: Product[]; cate
       </section>
 
       {/* SCENE 3 — Galeri 9 */}
-      <section className="py-16 bg-white" aria-label="Galeri video rasa" data-gallery>
+      <section className="py-16 bg-[var(--card)]" aria-label="Galeri video rasa" data-gallery>
         <div className="mx-auto max-w-6xl px-4">
           <div className="text-center max-w-2xl mx-auto">
             <p className="text-xs font-bold tracking-widest uppercase text-[var(--primary)] flex items-center justify-center gap-2"><Sparkles className="w-4 h-4" /> Flavor Gallery</p>
             <h2 className="text-3xl sm:text-4xl font-bold mt-2" style={{ fontFamily: "var(--font-display)" }}>Hover to peek — <span className="glaze-text">flavor videos</span></h2>
-            <p className="text-sm text-[var(--muted-foreground)] mt-2">9 loop videos — hover to feel the motion.</p>
+            <p className="text-sm text-[var(--muted-foreground)] mt-2">6 loop videos — hover to feel the motion.</p>
           </div>
-          <div className="mt-8 h-[520px] rounded-[2rem] overflow-hidden border border-[var(--border)] p-2 bg-[var(--muted)]/40">
+          <div className="mt-8 h-[420px] rounded-[2rem] overflow-hidden border border-[var(--border)] p-2 bg-[var(--muted)]/40">
             <DynamicFrameLayout frames={frames} hoverSize={6} gapSize={4} />
           </div>
         </div>
         {/* hidden stagger tiles for scrub */}
         <div className="hidden">
-          {Array.from({ length: 9 }).map((_, i) => (
+          {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} data-gallery-tile />
           ))}
         </div>

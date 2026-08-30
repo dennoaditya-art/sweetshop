@@ -14,8 +14,8 @@ export const siteConfig = {
   footerText: "Artisan ice cream • Made with love",
   nav: [
     { label: "Menu", href: "/menu" },
-    { label: "Flavors", href: "/#flavors" },
-    { label: "About", href: "/#about" },
+    { label: "Flavors", href: "/flavors" },
+    { label: "About", href: "/about" },
   ] as const,
   hero: {
     badge: "Fresh drop • Artisan made",

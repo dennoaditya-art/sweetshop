@@ -10,9 +10,9 @@ export default async function AdminPage() {
   const session = await getSession()
   if (!session) redirect("/admin/login")
   const [rawProducts, categories, orders] = await Promise.all([
-    prisma.product.findMany({ include: { category: true }, orderBy: { createdAt: "desc" } }),
+    prisma.product.findMany({ include: { category: true }, orderBy: { createdAt: "desc" }, take: 100 }),
     prisma.category.findMany({ orderBy: { id: "asc" } }),
-    prisma.order.findMany({ include: { items: true }, orderBy: { createdAt: "desc" } }),
+    prisma.order.findMany({ include: { items: true }, orderBy: { createdAt: "desc" }, take: 100 }),
   ])
   const products = rawProducts.map(parseProduct)
   return <AdminClient products={products} categories={categories} orders={orders} />

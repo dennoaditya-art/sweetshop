@@ -1,6 +1,7 @@
 /**
  * Theme tokens — buyer edits here to recolor entire shop.
- * Mirrors src/app/globals.css :root vars.
+ * Mirrors src/app/globals.css :root vars. Keep in sync: background/foreground/primary etc must match :root.
+ * ponytail: no codegen — buyer edits both files (2 places) for Gumroad starter simplicity.
  */
 export const themeConfig = {
   // Nail Art Fresh (default) — buyer can swap to any palette

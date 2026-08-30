@@ -2,6 +2,7 @@ import { cookies } from "next/headers"
 import { decrypt, encrypt } from "./crypto"
 
 const SESSION_KEY = "sweetshop-session"
+const isProd = process.env.NODE_ENV === "production"
 
 export interface SessionPayload {
   userId: string
@@ -25,7 +26,7 @@ export async function setSession(payload: SessionPayload) {
   const encrypted = await encrypt(payload)
   cookieStore.set(SESSION_KEY, encrypted, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isProd,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24,
@@ -36,7 +37,7 @@ export async function clearSession() {
   const cookieStore = await cookies()
   cookieStore.set(SESSION_KEY, "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isProd,
     sameSite: "lax",
     path: "/",
     maxAge: 0,
