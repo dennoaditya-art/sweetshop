@@ -16,9 +16,21 @@ export default async function PesananPage({ params, searchParams }: { params: Pr
   const { id } = await params
   const { phone, paid } = (await searchParams) ?? {}
   const session = await getSession()
-  const order = await prisma.order.findUnique({ where: { id }, include: { items: true } })
-  if (!order) notFound()
-  if (!session && phone !== order.customerPhone) notFound()
+  let order = await prisma.order.findUnique({ where: { id }, include: { items: true } })
+  // allow short id (8 chars) — find by prefix
+  if (!order && id.length === 8) {
+    order = await prisma.order.findFirst({ where: { id: { startsWith: id } }, include: { items: true } })
+  }
+  if (!order) {
+    return (
+      <div className="flex flex-col min-h-screen"><Header /><CartDrawer /><main className="flex-1 mx-auto max-w-xl px-4 py-12 text-center"><h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>Pesanan tidak ditemukan</h1><p className="text-sm text-[var(--muted-foreground)] mt-2">ID <span className="font-mono">{id}</span> tidak ada. Cek kembali atau lacak via HP.</p><div className="mt-6 flex gap-2 justify-center"><a href="/pesanan" className="inline-flex h-10 px-6 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] items-center font-semibold">Lacak Pesanan</a><a href="/menu" className="inline-flex h-10 px-6 rounded-full border border-[var(--border)] items-center">Menu</a></div></main><Footer /></div>
+    )
+  }
+  if (!session && phone !== order.customerPhone) {
+    return (
+      <div className="flex flex-col min-h-screen"><Header /><CartDrawer /><main className="flex-1 mx-auto max-w-md px-4 py-12"><h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>Verifikasi HP</h1><p className="text-sm text-[var(--muted-foreground)] mt-2">Pesanan <span className="font-mono">{order.id.slice(0,8).toUpperCase()}</span> perlu HP untuk dilihat.</p><form method="GET" className="mt-4 space-y-3 glass-card rounded-2xl p-4"><input type="hidden" name="paid" value={paid ?? ""} /><label className="text-sm font-medium">HP pemesan</label><input name="phone" placeholder="08..." required inputMode="tel" className="flex h-10 w-full rounded-full border border-[var(--border)] bg-[var(--card)] px-4 text-sm" defaultValue={phone ?? ""} /><button type="submit" className="w-full h-10 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] font-semibold">Lihat Pesanan</button></form><p className="text-xs text-center text-[var(--muted-foreground)] mt-4">Atau login sebagai admin di <a href="/admin/login" className="underline">/admin/login</a></p></main><Footer /></div>
+    )
+  }
   const isPaid = order.paymentStatus === "paid" || paid === "1"
   const shortId = order.id.slice(0, 8).toUpperCase()
 
