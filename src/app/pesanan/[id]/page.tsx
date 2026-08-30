@@ -7,7 +7,8 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/session"
-import { CheckCircle, Package, Truck, MapPin, Phone, Copy, MessageCircle, Sparkles } from "lucide-react"
+import { CheckCircle, Package, Truck, MapPin, Phone, MessageCircle, Sparkles } from "lucide-react"
+import { CopyButton } from "./copy-button"
 
 export const dynamic = "force-dynamic"
 
@@ -89,7 +90,7 @@ export default async function PesananPage({ params, searchParams }: { params: Pr
               <MessageCircle className="w-4 h-4" /> Chat via WhatsApp
             </a>
             <div className="flex gap-2">
-              <Link href={`/pesanan/${order.id}?phone=${encodeURIComponent(order.customerPhone)}`} className="flex-1"><Button variant="outline" className="w-full" onClick={() => navigator.clipboard?.writeText(shortId)}><Copy className="w-4 h-4" /> Salin ID</Button></Link>
+              <div className="flex-1"><CopyButton text={shortId} /></div>
               <Link href="/menu" className="flex-1"><Button variant="outline" className="w-full">Belanja lagi</Button></Link>
               <Link href="/" className="flex-1"><Button className="w-full">Ke Beranda</Button></Link>
             </div>
