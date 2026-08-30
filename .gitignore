@@ -53,3 +53,5 @@ prisma/*.db
 .claude/
 .cursor/
 .devin/
+
+.vercel
