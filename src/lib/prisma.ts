@@ -9,18 +9,16 @@ const globalForPrisma = globalThis as unknown as {
 
 function getDatabaseUrl(): string {
   const raw = process.env.DATABASE_URL ?? "file:./prisma/dev.db"
-  // ponytail: Vercel filesystem read-only — copy file DB to /tmp writable
+  // ponytail: Vercel filesystem read-only — copy file DB to /tmp writable (always overwrite for fresh deploys)
   if (process.env.VERCEL && raw.startsWith("file:")) {
     const tmpPath = "/tmp/dev.db"
     const tmpUrl = `file:${tmpPath}`
     try {
-      if (!existsSync(tmpPath)) {
-        // source is bundled at ./prisma/dev.db (read-only), copy to /tmp
-        const src = path.join(process.cwd(), "prisma", "dev.db")
-        if (existsSync(src)) {
-          mkdirSync(path.dirname(tmpPath), { recursive: true })
-          copyFileSync(src, tmpPath)
-        }
+      const src = path.join(process.cwd(), "prisma", "dev.db")
+      if (existsSync(src)) {
+        mkdirSync(path.dirname(tmpPath), { recursive: true })
+        // always overwrite to ensure new deploys get fresh seed (fixes stale /tmp)
+        copyFileSync(src, tmpPath)
       }
     } catch {}
     return tmpUrl
