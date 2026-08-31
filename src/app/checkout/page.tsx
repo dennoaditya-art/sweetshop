@@ -79,6 +79,12 @@ export default function CheckoutPage() {
       if (!tokenRes.ok) throw new Error(tokenData.error)
 
       if (tokenData.isMock) {
+        // ponytail: simpan ke localStorage sebagai fallback jika Vercel DB ephemeral (file: di /tmp)
+        try {
+          const toStore = { ...data.order, customerPhone: form.phone, customerName: form.name, customerAddress: form.address, customerNotes: form.notes }
+          localStorage.setItem("sweetshop_last_order", JSON.stringify(toStore))
+          sessionStorage.setItem("sweetshop_last_order", JSON.stringify(toStore))
+        } catch {}
         // mock: langsung anggap sukses — sertakan paid=1 agar badge Lunas
         clearCart()
         router.push(`/pesanan/${data.order.id}?phone=${encodeURIComponent(form.phone)}&paid=1`)
@@ -103,6 +109,12 @@ export default function CheckoutPage() {
           document.body.appendChild(s)
         })
       }
+      // simpan juga untuk Midtrans agar fallback tetap ada
+      try {
+        const toStore = { ...data.order, customerPhone: form.phone, customerName: form.name, customerAddress: form.address }
+        localStorage.setItem("sweetshop_last_order", JSON.stringify(toStore))
+        sessionStorage.setItem("sweetshop_last_order", JSON.stringify(toStore))
+      } catch {}
       window.snap!.pay(tokenData.snapToken, {
         onSuccess: () => { clearCart(); router.push(`/pesanan/${data.order.id}?phone=${encodeURIComponent(form.phone)}`) },
         onPending: () => { clearCart(); router.push(`/pesanan/${data.order.id}?phone=${encodeURIComponent(form.phone)}`) },

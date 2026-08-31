@@ -1,41 +1,57 @@
-import { prisma } from "@/lib/prisma"
+"use client"
+import { useEffect, useState } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { CartDrawer } from "@/components/cart-drawer"
 import { formatPrice } from "@/lib/utils"
-import { notFound } from "next/navigation"
+import { CheckCircle, Package, Truck, MapPin, Phone, MessageCircle, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { getSession } from "@/lib/session"
-import { CheckCircle, Package, Truck, MapPin, Phone, MessageCircle, Sparkles } from "lucide-react"
 import { CopyButton } from "./copy-button"
-import { PesananFallback } from "./fallback-order"
 
-export const dynamic = "force-dynamic"
+type StoredOrder = {
+  id: string
+  customerName: string
+  customerPhone: string
+  customerAddress: string
+  customerNotes?: string
+  total: number
+  status: string
+  paymentStatus: string
+  createdAt: string
+  items: { id: string; productName: string; productPrice: number; quantity: number; image: string; variant?: string | null }[]
+}
 
-export default async function PesananPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams?: Promise<{ phone?: string; paid?: string }> }) {
-  const { id } = await params
-  const { phone, paid } = (await searchParams) ?? {}
-  const session = await getSession()
-  let order = await prisma.order.findUnique({ where: { id }, include: { items: true } })
-  // allow short id (8 chars) — find by prefix
-  if (!order && id.length === 8) {
-    order = await prisma.order.findFirst({ where: { id: { startsWith: id } }, include: { items: true } })
-  }
-  if (!order) {
-    // ponytail: Vercel SQLite ephemeral — fallback ke localStorage agar "Pesanan Berhasil" tetap muncul di perangkat pemesan
-    return (
-      <>
-        <PesananFallback id={id} phone={phone} paid={paid} />
-        <div className="flex flex-col min-h-screen"><Header /><CartDrawer /><main className="flex-1 mx-auto max-w-xl px-4 py-12 text-center"><h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>Pesanan tidak ditemukan</h1><p className="text-sm text-[var(--muted-foreground)] mt-2">ID <span className="font-mono">{id}</span> tidak ada. Cek kembali atau lacak via HP.</p><p className="text-xs text-amber-600 mt-3">Jika kamu baru checkout di perangkat ini, success view akan muncul di atas (fallback). Untuk permanen, aktifkan Turso di Vercel Env.</p><div className="mt-6 flex gap-2 justify-center"><a href="/pesanan" className="inline-flex h-10 px-6 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] items-center font-semibold">Lacak Pesanan</a><a href="/menu" className="inline-flex h-10 px-6 rounded-full border border-[var(--border)] items-center">Menu</a></div></main><Footer /></div>
-      </>
-    )
-  }
-  if (!session && phone !== order.customerPhone) {
-    return (
-      <div className="flex flex-col min-h-screen"><Header /><CartDrawer /><main className="flex-1 mx-auto max-w-md px-4 py-12"><h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>Verifikasi HP</h1><p className="text-sm text-[var(--muted-foreground)] mt-2">Pesanan <span className="font-mono">{order.id.slice(0,8).toUpperCase()}</span> perlu HP untuk dilihat.</p><form method="GET" className="mt-4 space-y-3 glass-card rounded-2xl p-4"><input type="hidden" name="paid" value={paid ?? ""} /><label className="text-sm font-medium">HP pemesan</label><input name="phone" placeholder="08..." required inputMode="tel" className="flex h-10 w-full rounded-full border border-[var(--border)] bg-[var(--card)] px-4 text-sm" defaultValue={phone ?? ""} /><button type="submit" className="w-full h-10 rounded-full bg-[var(--primary)] text-[var(--primary-foreground)] font-semibold">Lihat Pesanan</button></form><p className="text-xs text-center text-[var(--muted-foreground)] mt-4">Atau login sebagai admin di <a href="/admin/login" className="underline">/admin/login</a></p></main><Footer /></div>
-    )
-  }
+export function PesananFallback({ id, phone, paid }: { id: string; phone?: string; paid?: string }) {
+  const [order, setOrder] = useState<StoredOrder | null>(null)
+  const [checked, setChecked] = useState(false)
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("sweetshop_last_order")
+      if (raw) {
+        const o = JSON.parse(raw) as StoredOrder
+        // cocokkan full id atau short 8
+        if (o.id === id || o.id.startsWith(id) || id.startsWith(o.id.slice(0, 8))) {
+          // verifikasi phone jika ada
+          if (!phone || phone === o.customerPhone) {
+            setOrder(o)
+          }
+        }
+      }
+      // juga cek sessionStorage fallback
+      const raw2 = sessionStorage.getItem("sweetshop_last_order")
+      if (!order && raw2) {
+        const o = JSON.parse(raw2) as StoredOrder
+        if (o.id === id || o.id.startsWith(id)) setOrder(o)
+      }
+    } catch {}
+    setChecked(true)
+  }, [id, phone])
+
+  if (!checked) return null
+  if (!order) return null // biar parent render "tidak ditemukan" asli
+
   const isPaid = order.paymentStatus === "paid" || paid === "1"
   const shortId = order.id.slice(0, 8).toUpperCase()
 
@@ -43,7 +59,6 @@ export default async function PesananPage({ params, searchParams }: { params: Pr
     <div className="flex flex-col min-h-screen">
       <Header /><CartDrawer />
       <main className="flex-1 mx-auto max-w-2xl px-4 py-8 w-full">
-        {/* Success hero */}
         <div className="text-center mb-6">
           <div className="mx-auto w-20 h-20 rounded-full bg-green-100 border-4 border-green-200 flex items-center justify-center shadow-lg" style={{ boxShadow: "0 8px 24px rgba(34,197,94,0.25)" }}>
             <CheckCircle className="w-10 h-10 text-green-600" />
@@ -59,9 +74,9 @@ export default async function PesananPage({ params, searchParams }: { params: Pr
             <span className={`px-2 py-0.5 rounded-full text-xs border ${isPaid ? "bg-green-100 border-green-200 text-green-700" : "bg-amber-100 border-amber-200 text-amber-700"}`}>{isPaid ? "Lunas" : "Menunggu bayar"}</span>
           </div>
           <p className="text-xs text-[var(--muted-foreground)] mt-2 flex items-center justify-center gap-1"><Sparkles className="w-3 h-3 text-[var(--primary)]" /> Simpan ID ini untuk lacak pesanan</p>
+          <p className="text-[10px] text-amber-600 mt-2">Ditampilkan dari perangkat ini (DB Vercel ephemeral — segera aktifkan Turso untuk permanen)</p>
         </div>
 
-        {/* Timeline */}
         <div className="flex justify-center gap-2 mb-6">
           {[
             { label: "Diterima", active: true, icon: Package },
@@ -79,14 +94,12 @@ export default async function PesananPage({ params, searchParams }: { params: Pr
             <h2 className="font-bold flex items-center gap-2"><Package className="w-4 h-4 text-[var(--primary)]" /> Detail Pesanan</h2>
             <span className="text-xs px-2 py-1 rounded-full bg-[var(--muted)] border">{order.status} • {order.paymentStatus}</span>
           </div>
-
           <div className="grid gap-3 text-sm p-3 rounded-2xl bg-[var(--muted)]/40 border border-[var(--border)]">
             <p className="flex gap-2"><span className="text-[var(--muted-foreground)] flex items-center gap-1"><Phone className="w-3 h-3" /> HP:</span> <span className="font-medium">{order.customerPhone}</span></p>
             <p className="flex gap-2"><span className="text-[var(--muted-foreground)]">Nama:</span> <span className="font-medium">{order.customerName}</span></p>
             <p className="flex gap-2"><span className="text-[var(--muted-foreground)] flex items-center gap-1"><MapPin className="w-3 h-3" /> Alamat:</span> <span>{order.customerAddress}</span></p>
             {order.customerNotes && <p className="text-xs text-[var(--muted-foreground)] border-t border-[var(--border)] pt-2">Catatan: {order.customerNotes}</p>}
           </div>
-
           <div className="space-y-2">
             {order.items.map((it) => (
               <div key={it.id} className="flex gap-3 text-sm p-2 rounded-xl hover:bg-[var(--muted)]/30 transition-colors">
@@ -101,7 +114,6 @@ export default async function PesananPage({ params, searchParams }: { params: Pr
             <div className="flex justify-between font-bold text-lg border-t border-[var(--border)] pt-3"><span>Total</span><span className="text-[var(--primary)]">{formatPrice(order.total)}</span></div>
             <p className="text-xs text-[var(--muted-foreground)] text-center">Pembayaran: {order.paymentStatus} • ID: {shortId} • {new Date(order.createdAt).toLocaleString("id-ID")}</p>
           </div>
-
           <div className="grid gap-2">
             <a href={`https://wa.me/?text=${encodeURIComponent(`Halo! Saya mau tanya pesanan ${shortId} — ${order.customerName}`)}`} target="_blank" className="inline-flex items-center justify-center gap-2 w-full h-11 rounded-full bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors">
               <MessageCircle className="w-4 h-4" /> Chat via WhatsApp
@@ -113,8 +125,7 @@ export default async function PesananPage({ params, searchParams }: { params: Pr
             </div>
           </div>
         </div>
-
-        <p className="text-center text-xs text-[var(--muted-foreground)] mt-6">Butuh bantuan? Hubungi {order.customerPhone ? "admin via WA di atas" : "support"} • Simpan link ini: <span className="font-mono">{`/pesanan/${shortId}`}</span></p>
+        <p className="text-center text-xs text-[var(--muted-foreground)] mt-6">Butuh bantuan? Hubungi admin via WA di atas • Simpan link ini: <span className="font-mono">{`/pesanan/${shortId}`}</span></p>
       </main>
       <Footer />
     </div>
