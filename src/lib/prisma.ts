@@ -8,7 +8,7 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 function getDatabaseUrl(): string {
-  const raw = process.env.DATABASE_URL ?? "file:./prisma/dev.db"
+  const raw = process.env.DATABASE_URL ?? process.env.TURSO_DATABASE_URL ?? "file:./prisma/dev.db"
   // ponytail: Vercel filesystem read-only — SQLite di Vercel ephemeral per-lambda, pesanan akan hilang antar-request.
   // Fix permanen: set DATABASE_URL=libsql://... + DATABASE_AUTH_TOKEN (Turso) di Vercel Env. Fallback file: hanya untuk dev.
   if (process.env.VERCEL && raw.startsWith("file:")) {
@@ -31,7 +31,7 @@ function getDatabaseUrl(): string {
 function createPrismaClient() {
   const adapter = new PrismaLibSql({
     url: getDatabaseUrl(),
-    authToken: process.env.DATABASE_AUTH_TOKEN,
+    authToken: process.env.DATABASE_AUTH_TOKEN ?? process.env.TURSO_AUTH_TOKEN,
   })
   return new PrismaClient({ adapter })
 }
